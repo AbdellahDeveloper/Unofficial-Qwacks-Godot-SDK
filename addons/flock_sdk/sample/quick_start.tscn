@@ -1,0 +1,80 @@
+[gd_scene format=3 uid="uid://dmvtopxoaniad"]
+
+[ext_resource type="Script" uid="uid://d4fwsap1pg2b7" path="res://addons/flock_sdk/sample/quick_start.gd" id="1"]
+[ext_resource type="Script" uid="uid://bkicmmehafx36" path="res://addons/flock_sdk/bootstrap/flock_auto_initializer.gd" id="2_nw7qw"]
+
+[node name="QuickStart" type="Control" unique_id=1199542754]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=809304572]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=897525759]
+layout_mode = 2
+text = "Flock SDK Quick Start"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="VBoxContainer" unique_id=959098813]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Not initialized"
+horizontal_alignment = 1
+
+[node name="PlayerIdLabel" type="Label" parent="VBoxContainer" unique_id=787901382]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Player ID: -"
+horizontal_alignment = 1
+
+[node name="LoginButton" type="Button" parent="VBoxContainer" unique_id=717914244]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Login (Device)"
+
+[node name="LogoutButton" type="Button" parent="VBoxContainer" unique_id=83712615]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Logout"
+
+[node name="SendEventButton" type="Button" parent="VBoxContainer" unique_id=15555804]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Send Test Event"
+
+[node name="LogErrorButton" type="Button" parent="VBoxContainer" unique_id=368910521]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Log Test Error"
+
+[node name="FlockAutoInitializer" type="Node" parent="." unique_id=1603756914]
+script = ExtResource("2_nw7qw")
+game_id = "01KXRBFYZEBMA9CAGTZSSEK69T"
+game_version_id = "01KXRBST8NS0A8EN93BRZX1JD4"
+api_key = "flock_bba0b9a2adc764bec03337d23376e3f2754565445b06bcce35c0b3cf932ef4a3"
+metadata/_custom_type_script = "uid://bkicmmehafx36"
+
+[connection signal="pressed" from="VBoxContainer/LoginButton" to="." method="_on_login_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/LogoutButton" to="." method="_on_logout_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/SendEventButton" to="." method="_on_send_event_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/LogErrorButton" to="." method="_on_log_error_button_pressed"]

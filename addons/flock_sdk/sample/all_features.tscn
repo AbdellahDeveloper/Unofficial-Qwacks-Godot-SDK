@@ -1,0 +1,879 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://addons/flock_sdk/sample/all_features.gd" id="1"]
+[ext_resource type="Script" path="res://addons/flock_sdk/bootstrap/flock_auto_initializer.gd" id="2"]
+
+[node name="AllFeaturesDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="HSplitContainer" type="HSplitContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+split_offset = -400
+
+[node name="Left" type="VBoxContainer" parent="HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Title" type="Label" parent="HSplitContainer/Left"]
+layout_mode = 2
+text = "Flock SDK - All Features Demo"
+horizontal_alignment = 1
+
+[node name="AuthStatus" type="HBoxContainer" parent="HSplitContainer/Left"]
+layout_mode = 2
+
+[node name="AuthPlayerIdLabel" type="Label" parent="HSplitContainer/Left/AuthStatus"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Player ID: -"
+
+[node name="AuthTokenLabel" type="Label" parent="HSplitContainer/Left/AuthStatus"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Token: -"
+
+[node name="TabContainer" type="TabContainer" parent="HSplitContainer/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Auth" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Authentication"
+horizontal_alignment = 1
+
+[node name="LoginDevice" type="Button" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Login (Device)"
+
+[node name="RegisterDevice" type="Button" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Register (Device)"
+
+[node name="RegNameLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Register Name (optional):"
+
+[node name="RegNameInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Display name"
+
+[node name="Sep1" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="EmailLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Email:"
+
+[node name="AuthEmailInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "user@example.com"
+
+[node name="PasswordLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Password:"
+
+[node name="AuthPasswordInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth"]
+unique_name_in_owner = true
+layout_mode = 2
+secret = true
+placeholder_text = "password"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="LoginEmail" type="Button" parent="HSplitContainer/Left/TabContainer/Auth/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Login (Email)"
+
+[node name="RegisterEmail" type="Button" parent="HSplitContainer/Left/TabContainer/Auth/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Register (Email)"
+
+[node name="Sep2" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Check Player Name:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="CheckNameInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "PlayerName"
+
+[node name="CheckName" type="Button" parent="HSplitContainer/Left/TabContainer/Auth/HBox2"]
+layout_mode = 2
+text = "Check"
+
+[node name="Sep3" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="RevokeToken" type="Button" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Revoke Token"
+
+[node name="Logout" type="Button" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Logout"
+
+[node name="Sep4" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="EmailVerifyLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Email Verification:"
+
+[node name="HBox3" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="SendVerification" type="Button" parent="HSplitContainer/Left/TabContainer/Auth/HBox3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Send Code"
+
+[node name="VerifyCodeInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth/HBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Code"
+
+[node name="VerifyEmail" type="Button" parent="HSplitContainer/Left/TabContainer/Auth/HBox3"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Verify"
+
+[node name="Sep5" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="PasswordResetLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Password Reset:"
+
+[node name="ForgotPw" type="Button" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+text = "Forgot Password (uses email above)"
+
+[node name="HBox4" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Auth"]
+layout_mode = 2
+
+[node name="ResetEmailInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth/HBox4"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Email"
+
+[node name="ResetCodeInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth/HBox4"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Code"
+
+[node name="ResetNewPwInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Auth/HBox4"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "New PW"
+
+[node name="ResetPassword" type="Button" parent="HSplitContainer/Left/TabContainer/Auth/HBox4"]
+layout_mode = 2
+text = "Reset"
+
+[node name="PlayerData" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Player Data"
+horizontal_alignment = 1
+
+[node name="GetAll" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Get All Player Data"
+
+[node name="Sep1" type="HSeparator" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+
+[node name="Label1" type="Label" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Player Data ID:"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+
+[node name="PlayerDataIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/PlayerData/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Player data ID"
+
+[node name="GetById" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData/HBox"]
+layout_mode = 2
+text = "Get By ID"
+
+[node name="Label2" type="Label" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Template ID:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+
+[node name="PlayerTemplateIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/PlayerData/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Template ID"
+
+[node name="GetByTemplate" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData/HBox2"]
+layout_mode = 2
+text = "My Data By Template"
+
+[node name="Label3" type="Label" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Tag:"
+
+[node name="HBox3" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+
+[node name="PlayerTagInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/PlayerData/HBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Tag name"
+
+[node name="GetByTag" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData/HBox3"]
+layout_mode = 2
+text = "My Data By Tag"
+
+[node name="Sep2" type="HSeparator" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+
+[node name="GetTemplates" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Get All Templates"
+
+[node name="GetTemplateByTag" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Get Template By Tag (uses tag above)"
+
+[node name="GetBan" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Get My Ban Status"
+
+[node name="ClearCache" type="Button" parent="HSplitContainer/Left/TabContainer/PlayerData"]
+layout_mode = 2
+text = "Clear Player Cache"
+
+[node name="Config" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+text = "Game Config"
+horizontal_alignment = 1
+
+[node name="GetAllPatches" type="Button" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+text = "Get All Patches"
+
+[node name="Label1" type="Label" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+text = "Config Name:"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+
+[node name="ConfigNameInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Config/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Config name"
+
+[node name="GetByName" type="Button" parent="HSplitContainer/Left/TabContainer/Config/HBox"]
+layout_mode = 2
+text = "Get By Name"
+
+[node name="Label2" type="Label" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+text = "Config/Schema ID:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+
+[node name="ConfigIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Config/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Config or Schema ID"
+
+[node name="GetById" type="Button" parent="HSplitContainer/Left/TabContainer/Config/HBox2"]
+layout_mode = 2
+text = "Get By Config ID"
+
+[node name="GetBySchema" type="Button" parent="HSplitContainer/Left/TabContainer/Config/HBox2"]
+layout_mode = 2
+text = "Get Patches By Schema"
+
+[node name="ClearCache" type="Button" parent="HSplitContainer/Left/TabContainer/Config"]
+layout_mode = 2
+text = "Clear Config Cache"
+
+[node name="Game" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Game"]
+layout_mode = 2
+text = "Game Info"
+horizontal_alignment = 1
+
+[node name="GetGame" type="Button" parent="HSplitContainer/Left/TabContainer/Game"]
+layout_mode = 2
+text = "Get Game"
+
+[node name="GetVersion" type="Button" parent="HSplitContainer/Left/TabContainer/Game"]
+layout_mode = 2
+text = "Get Game Version"
+
+[node name="ClearCache" type="Button" parent="HSplitContainer/Left/TabContainer/Game"]
+layout_mode = 2
+text = "Clear Game Cache"
+
+[node name="Shop" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+text = "Shop & Inventory"
+horizontal_alignment = 1
+
+[node name="GetAllShops" type="Button" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+text = "Get All Shops"
+
+[node name="Label1" type="Label" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+text = "Shop ID:"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+
+[node name="ShopIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Shop/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Shop ID"
+
+[node name="GetById" type="Button" parent="HSplitContainer/Left/TabContainer/Shop/HBox"]
+layout_mode = 2
+text = "Get By ID"
+
+[node name="GetItems" type="Button" parent="HSplitContainer/Left/TabContainer/Shop/HBox"]
+layout_mode = 2
+text = "Get Items"
+
+[node name="Label2" type="Label" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+text = "Shop Item ID:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+
+[node name="ShopItemIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Shop/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Item ID"
+
+[node name="GetItem" type="Button" parent="HSplitContainer/Left/TabContainer/Shop/HBox2"]
+layout_mode = 2
+text = "Get Item"
+
+[node name="Purchase" type="Button" parent="HSplitContainer/Left/TabContainer/Shop/HBox2"]
+layout_mode = 2
+text = "Purchase"
+
+[node name="GetInventory" type="Button" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+text = "Get My Inventory"
+
+[node name="ClearCache" type="Button" parent="HSplitContainer/Left/TabContainer/Shop"]
+layout_mode = 2
+text = "Clear Shop Cache"
+
+[node name="Commands" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Game Commands"
+horizontal_alignment = 1
+
+[node name="Label1" type="Label" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Player Data ID:"
+
+[node name="CmdPlayerDataIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Commands"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Player data ID"
+
+[node name="Label2" type="Label" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Key / Value:"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+
+[node name="CmdKeyInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Commands/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Key"
+
+[node name="CmdValueInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Commands/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Value"
+
+[node name="UpdateField" type="Button" parent="HSplitContainer/Left/TabContainer/Commands/HBox"]
+layout_mode = 2
+text = "Update Field"
+
+[node name="UpdateData" type="Button" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Update Full Data"
+
+[node name="Sep1" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+
+[node name="FundsLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Currency / Amount:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+
+[node name="CmdCurrencyInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Commands/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Gold"
+
+[node name="CmdAmountInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Commands/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "100"
+
+[node name="AddFunds" type="Button" parent="HSplitContainer/Left/TabContainer/Commands/HBox2"]
+layout_mode = 2
+text = "Add Funds"
+
+[node name="Sep2" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+
+[node name="AchievementLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Achievement Name:"
+
+[node name="HBox3" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+
+[node name="CmdAchievementInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Commands/HBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "first_kill"
+
+[node name="UnlockAchievement" type="Button" parent="HSplitContainer/Left/TabContainer/Commands/HBox3"]
+layout_mode = 2
+text = "Unlock"
+
+[node name="FlushWrites" type="Button" parent="HSplitContainer/Left/TabContainer/Commands"]
+layout_mode = 2
+text = "Flush Pending Writes"
+
+[node name="Assets" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+text = "Assets"
+horizontal_alignment = 1
+
+[node name="GetAllAssets" type="Button" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+text = "Get All Assets"
+
+[node name="Label1" type="Label" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+text = "Asset ID:"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+
+[node name="AssetIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Assets/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Asset ID"
+
+[node name="GetById" type="Button" parent="HSplitContainer/Left/TabContainer/Assets/HBox"]
+layout_mode = 2
+text = "Get By ID"
+
+[node name="Download" type="Button" parent="HSplitContainer/Left/TabContainer/Assets/HBox"]
+layout_mode = 2
+text = "Download"
+
+[node name="Label2" type="Label" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+text = "Asset Name:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+
+[node name="AssetNameInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Assets/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Asset name"
+
+[node name="GetByName" type="Button" parent="HSplitContainer/Left/TabContainer/Assets/HBox2"]
+layout_mode = 2
+text = "Get By Name"
+
+[node name="ClearCache" type="Button" parent="HSplitContainer/Left/TabContainer/Assets"]
+layout_mode = 2
+text = "Clear Asset Cache"
+
+[node name="Analytics" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Analytics"
+horizontal_alignment = 1
+
+[node name="EventLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Event Name / Props (JSON):"
+
+[node name="HBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="EventNameInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "event_name"
+
+[node name="EventPropsInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "{\"key\": \"value\"}"
+
+[node name="LogEvent" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics/HBox"]
+layout_mode = 2
+text = "Log Event"
+
+[node name="RecordScreenView" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Record Screen View (uses event name)"
+
+[node name="Sep1" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="ErrorLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Error Message / Code:"
+
+[node name="HBox2" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="ErrorMessageInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Something went wrong"
+
+[node name="ErrorCodeInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "ERROR_CODE"
+
+[node name="LogError" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics/HBox2"]
+layout_mode = 2
+text = "Log Error"
+
+[node name="LogException" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Log Exception (test)"
+
+[node name="Sep2" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="TxLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Transaction:"
+
+[node name="HBox3" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="TxAmountInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "9.99"
+
+[node name="TxCurrencyInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "USD"
+
+[node name="TxItemIdInput" type="LineEdit" parent="HSplitContainer/Left/TabContainer/Analytics/HBox3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Item ID (opt)"
+
+[node name="RecordTx" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics/HBox3"]
+layout_mode = 2
+text = "Record"
+
+[node name="Sep3" type="HSeparator" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="SessionHBox" type="HBoxContainer" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+
+[node name="StartSession" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics/SessionHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Start Session"
+
+[node name="EndSession" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics/SessionHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "End Session"
+
+[node name="FlushAnalytics" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Flush Analytics"
+
+[node name="SetConsent" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Toggle Consent"
+
+[node name="EraseData" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Erase Local Analytics Data"
+
+[node name="GetDeviceInfo" type="Button" parent="HSplitContainer/Left/TabContainer/Analytics"]
+layout_mode = 2
+text = "Get Device Info"
+
+[node name="Client" type="VBoxContainer" parent="HSplitContainer/Left/TabContainer"]
+layout_mode = 2
+
+[node name="SectionLabel" type="Label" parent="HSplitContainer/Left/TabContainer/Client"]
+layout_mode = 2
+text = "Client / SDK Info"
+horizontal_alignment = 1
+
+[node name="RefreshInfo" type="Button" parent="HSplitContainer/Left/TabContainer/Client"]
+layout_mode = 2
+text = "Refresh Client Info"
+
+[node name="Shutdown" type="Button" parent="HSplitContainer/Left/TabContainer/Client"]
+layout_mode = 2
+text = "Shutdown SDK"
+
+[node name="GetDataDirs" type="Button" parent="HSplitContainer/Left/TabContainer/Client"]
+layout_mode = 2
+text = "Print Data Directories"
+
+[node name="Right" type="VBoxContainer" parent="HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OutputLabel" type="RichTextLabel" parent="HSplitContainer/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Output will appear here..."
+
+[node name="HSplitBottom" type="TabContainer" parent="HSplitContainer/Right"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 200)
+
+[node name="SessionOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Session Info"
+
+[node name="EventsOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Events"
+
+[node name="PlayerDataOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Player Data"
+
+[node name="ConfigOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Config"
+
+[node name="GameOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Game"
+
+[node name="ShopOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Shop"
+
+[node name="AssetOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Assets"
+
+[node name="CmdOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Commands"
+
+[node name="AnalyticsOutput" type="RichTextLabel" parent="HSplitContainer/Right/HSplitBottom"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+text = "Analytics"
+
+[node name="FlockAutoInitializer" type="Node" parent="."]
+script = ExtResource("2")
+game_id = "01KXRBFYZEBMA9CAGTZSSEK69T"
+game_version_id = "01KXRBST8NS0A8EN93BRZX1JD4"
+api_url = "https://api-flock.qwacks.com"
+api_key = "flock_bba0b9a2adc764bec03337d23376e3f2754565445b06bcce35c0b3cf932ef4a3"
+enable_debug_logs = true
+
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/LoginDevice" to="." method="_on_login_device_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/RegisterDevice" to="." method="_on_register_device_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/HBox/LoginEmail" to="." method="_on_login_email_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/HBox/RegisterEmail" to="." method="_on_register_email_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/HBox2/CheckName" to="." method="_on_check_name_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/RevokeToken" to="." method="_on_revoke_token_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/Logout" to="." method="_on_logout_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/HBox3/SendVerification" to="." method="_on_send_verification_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/HBox3/VerifyEmail" to="." method="_on_verify_email_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/ForgotPw" to="." method="_on_forgot_password_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Auth/HBox4/ResetPassword" to="." method="_on_reset_password_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/GetAll" to="." method="_on_get_all_player_data_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/HBox/GetById" to="." method="_on_get_player_data_by_id_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/HBox2/GetByTemplate" to="." method="_on_get_my_data_by_template_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/HBox3/GetByTag" to="." method="_on_get_my_data_by_tag_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/GetTemplates" to="." method="_on_get_templates_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/GetTemplateByTag" to="." method="_on_get_template_by_tag_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/GetBan" to="." method="_on_get_ban_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/PlayerData/ClearCache" to="." method="_on_clear_player_cache_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Config/GetAllPatches" to="." method="_on_get_all_patches_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Config/HBox/GetByName" to="." method="_on_get_config_by_name_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Config/HBox2/GetById" to="." method="_on_get_config_by_id_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Config/HBox2/GetBySchema" to="." method="_on_get_patches_by_schema_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Config/ClearCache" to="." method="_on_clear_config_cache_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Game/GetGame" to="." method="_on_get_game_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Game/GetVersion" to="." method="_on_get_game_version_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Game/ClearCache" to="." method="_on_clear_game_cache_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/GetAllShops" to="." method="_on_get_all_shops_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/HBox/GetById" to="." method="_on_get_shop_by_id_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/HBox/GetItems" to="." method="_on_get_shop_items_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/HBox2/GetItem" to="." method="_on_get_shop_item_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/HBox2/Purchase" to="." method="_on_purchase_item_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/GetInventory" to="." method="_on_get_inventory_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Shop/ClearCache" to="." method="_on_clear_shop_cache_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Commands/HBox/UpdateField" to="." method="_on_cmd_update_field_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Commands/UpdateData" to="." method="_on_cmd_update_data_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Commands/HBox2/AddFunds" to="." method="_on_cmd_add_funds_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Commands/HBox3/UnlockAchievement" to="." method="_on_cmd_unlock_achievement_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Commands/FlushWrites" to="." method="_on_cmd_flush_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Assets/GetAllAssets" to="." method="_on_get_all_assets_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Assets/HBox/GetById" to="." method="_on_get_asset_by_id_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Assets/HBox/Download" to="." method="_on_download_asset_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Assets/HBox2/GetByName" to="." method="_on_get_asset_by_name_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Assets/ClearCache" to="." method="_on_clear_asset_cache_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/HBox/LogEvent" to="." method="_on_log_event_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/RecordScreenView" to="." method="_on_record_screen_view_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/HBox2/LogError" to="." method="_on_log_error_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/LogException" to="." method="_on_log_exception_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/HBox3/RecordTx" to="." method="_on_record_transaction_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/SessionHBox/StartSession" to="." method="_on_start_session_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/SessionHBox/EndSession" to="." method="_on_end_session_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/FlushAnalytics" to="." method="_on_flush_analytics_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/SetConsent" to="." method="_on_set_consent_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/EraseData" to="." method="_on_erase_analytics_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Analytics/GetDeviceInfo" to="." method="_on_get_device_info_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Client/RefreshInfo" to="." method="_on_refresh_client_info_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Client/Shutdown" to="." method="_on_shutdown_pressed"]
+[connection signal="pressed" from="HSplitContainer/Left/TabContainer/Client/GetDataDirs" to="." method="_on_delete_data_dir_pressed"]
