@@ -45,7 +45,7 @@ git clone https://github.com/unofficial-qwacks-godot-sdk/qwacks-godot-sdk.git fl
 
 1. Open your project in Godot Editor
 2. Go to **Project → Project Settings → Plugins** tab
-3. Find **"Flock SDK"** in the list
+3. Find **"Qwacks SDK"** in the list
 4. Check the **Enabled** checkbox
 
 ![Enable plugin](../screenshots/plugin-enable.png)
@@ -113,7 +113,7 @@ extends Node
 
 func _ready():
     FlockEvents.get_instance().initialized.connect(func():
-        print("Flock SDK initialized!")
+        print("Qwacks SDK initialized!")
         print("Player ID: ", FlockClient.get_instance().current_player_id)
     )
     
@@ -122,7 +122,7 @@ func _ready():
     )
 ```
 
-If you see "Flock SDK initialized!" in the output panel, you're good to go!
+If you see "Qwacks SDK initialized!" in the output panel, you're good to go!
 
 ## Project Structure
 

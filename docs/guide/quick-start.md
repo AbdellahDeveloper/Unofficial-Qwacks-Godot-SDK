@@ -6,7 +6,7 @@ Get your game connected to Qwacks in 5 minutes.
 
 1. Copy `addons/flock_sdk/` into your project
 2. Go to **Project → Project Settings → Plugins**
-3. Enable **"Flock SDK"**
+3. Enable **"Qwacks SDK"**
 
 ## Step 2: Add the Auto-Initializer
 

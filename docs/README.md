@@ -2,7 +2,7 @@
 
 Welcome to the **Unofficial Qwacks Godot SDK** documentation.
 
-This SDK is a pure GDScript port of the [Flock/QwackStack](https://qwacks.com) game backend SDK, designed for **Godot 4.x**.
+This SDK is a pure GDScript port of the [Qwacks](https://qwacks.com) game backend SDK, designed for **Godot 4.x**.
 
 ## Features
 

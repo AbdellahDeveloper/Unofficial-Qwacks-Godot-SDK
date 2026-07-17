@@ -1,6 +1,6 @@
 # Unofficial Qwacks Godot SDK
 
-A pure GDScript implementation of the [Flock/QwackStack](https://qwacks.com) game backend SDK for **Godot 4.x**.
+A pure GDScript implementation of the [Qwacks](https://qwacks.com) game backend SDK for **Godot 4.x**.
 
 > **Version 1.28.0** — Ported from the official C# Unity SDK.
 
@@ -51,7 +51,7 @@ your-project/
 
 ### 2. Enable the plugin
 
-In Godot Editor: **Project → Project Settings → Plugins → Enable "Flock SDK"**
+In Godot Editor: **Project → Project Settings → Plugins → Enable "Qwacks SDK"**
 
 ### 3. Add the Auto-Initializer
 
@@ -122,4 +122,4 @@ Full documentation is available at: **[unofficial-qwacks-godot-sdk.github.io/qwa
 
 MIT — See [LICENSE](LICENSE) for details.
 
-> **Disclaimer:** This is an unofficial community port. Not affiliated with QwackStack or Flock.
+> **Disclaimer:** This is an unofficial community port. Not affiliated with Qwacks.
