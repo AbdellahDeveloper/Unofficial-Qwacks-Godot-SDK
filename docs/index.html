@@ -9,45 +9,128 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css">
   <style>
     :root {
-      --theme-color: #478cbf;
+      --background: #0a0a0a;
+      --background-color: #0a0a0a;
+      --sidebar-background: #0f0f0f;
       --sidebar-width: 280px;
+      --sidebar-border-color: #1a1a1a;
+      --sidebar-nav-link-color: #888;
       --sidebar-nav-link-color--active: #478cbf;
       --sidebar-nav-link-border-color--active: #478cbf;
-      --code-background-color: #0d1117;
-      --code-color: #c9d1d9;
+      --sidebar-nav-link-font-weight--active: bold;
+      --sidebar-search-background-color: #161616;
+      --sidebar-search-input-color: #ccc;
+      --sidebar-search-input-background-color: #1a1a1a;
+      --sidebar-search-input-border-color: #222;
+      --sidebar-search-border-color: #222;
+      --sidebar-search-highlight-color: #478cbf;
+      --cover-background-color: #0a0a0a;
+      --cover-heading-color: #fff;
+      --cover-color: #aaa;
+      --cover-button-primary-color: #478cbf;
+      --cover-button-primary-color--hover: #3a7ab5;
+      --cover-blockquote-color: #888;
+      --text-color: #ccc;
+      --heading-color: #fff;
+      --heading-border-color: #1a1a1a;
+      --link-color: #478cbf;
+      --link-color--hover: #5da3d9;
+      --code-background-color: #111;
+      --code-color: #e0e0e0;
+      --code-border-color: #1a1a1a;
+      --markdown-section-color: #ccc;
+      --markdown-table-border-color: #222;
+      --markdown-table-stripe-background-color: #111;
+      --blockquote-border-color: #478cbf;
+      --blockquote-color: #888;
+      --hr-border-color: #1a1a1a;
+      --search-input-background-color: #161616;
+      --search-input-color: #ccc;
+      --search-result-background-color: #111;
+      --search-result-highlight-color: #478cbf;
+    }
+    body {
+      background: #0a0a0a;
+      color: #ccc;
     }
     .markdown-section code {
       border-radius: 4px;
       font-size: 0.9em;
+      background: #111;
+      color: #e0e0e0;
     }
     .markdown-section pre > code {
       padding: 16px;
+      background: #0d0d0d;
+      border: 1px solid #1a1a1a;
     }
     .markdown-section table {
       border-collapse: collapse;
       width: 100%;
     }
     .markdown-section th, .markdown-section td {
-      border: 1px solid #333;
+      border: 1px solid #222;
       padding: 8px 12px;
     }
     .markdown-section th {
-      background-color: #161b22;
+      background-color: #111;
+      color: #fff;
     }
     .markdown-section tr:nth-child(even) {
-      background-color: #161b22;
+      background-color: #0e0e0e;
     }
     .tip {
-      background-color: #161b22;
+      background-color: #0d1a24;
       border-left: 4px solid #478cbf;
       padding: 12px 24px;
       margin: 16px 0;
     }
     .warning {
-      background-color: #1c1a00;
+      background-color: #1a1600;
       border-left: 4px solid #e6a817;
       padding: 12px 24px;
       margin: 16px 0;
+    }
+    .sidebar {
+      background: #0f0f0f;
+      border-right: 1px solid #1a1a1a;
+    }
+    .sidebar-nav > ul > li > a {
+      color: #888;
+      border-color: #1a1a1a;
+    }
+    .sidebar-nav > ul > li > a:hover {
+      color: #fff;
+    }
+    .sidebar-nav > ul > li.active > a {
+      color: #478cbf;
+      border-color: #478cbf;
+      font-weight: bold;
+    }
+    .sidebar-nav li a {
+      color: #888;
+    }
+    .sidebar-nav li a:hover {
+      color: #ccc;
+    }
+    .sidebar-nav li.active > a {
+      color: #478cbf;
+    }
+    .search .matching-post {
+      background: #111;
+      border: 1px solid #1a1a1a;
+    }
+    .search .matching-post a {
+      color: #478cbf;
+    }
+    .app-nav {
+      background: #0f0f0f;
+    }
+    a {
+      color: #478cbf;
+    }
+    a:hover {
+      color: #5da3d9;
     }
   </style>
 </head>
