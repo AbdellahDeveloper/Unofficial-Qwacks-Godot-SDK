@@ -55,7 +55,11 @@ In Godot Editor: **Project → Project Settings → Plugins → Enable "Qwacks S
 
 ### 3. Add the Auto-Initializer
 
-Add a `FlockAutoInitializer` node to your root scene and configure it in the Inspector:
+Add a `FlockAutoInitializer` node to your root scene:
+
+![Add Node](screenshots/node.png)
+
+Then configure it in the Inspector:
 
 ![Inspector setup](screenshots/inspector-setup.png)
 
