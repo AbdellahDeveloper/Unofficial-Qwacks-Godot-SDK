@@ -1,0 +1,29 @@
+# Godot
+*.import
+export.cfg
+export_presets.cfg
+addons/.import/
+
+# Godot 4.x
+.godot/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Build
+build/
+bin/
+export/
+
+# Docs
+docs/node_modules/
+docs/.deprecated/
