@@ -5,7 +5,7 @@ A pure GDScript implementation of the [Qwacks](https://qwacks.com) game backend 
 > **Version 1.28.0** — Ported from the official C# Unity SDK.
 
 [![Godot 4.x](https://img.shields.io/badge/Godot-4.x-blue)](https://godotengine.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Documentation](https://img.shields.io/badge/Docs-docsify-blue)](https://unofficial-qwacks-godot-sdk.github.io/qwacks-godot-sdk/)
 
 ---
