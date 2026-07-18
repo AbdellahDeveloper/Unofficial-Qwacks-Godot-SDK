@@ -6,6 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="description" content="Pure GDScript SDK for the Qwacks game backend platform. Authentication, player data, analytics, shop, and more for Godot 4.x.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-73HK8HPMB5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-73HK8HPMB5');
+  </script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css">
   <style>
     :root {
@@ -202,5 +210,32 @@
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-gdscript.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script>
+    (function() {
+      var defined = false;
+      function trackPageView() {
+        if (typeof gtag === 'function') {
+          gtag('event', 'page_view', {
+            page_title: document.title,
+            page_location: window.location.href,
+            page_path: window.location.hash.slice(1) || '/'
+          });
+        }
+      }
+      if (typeof docsify !== 'undefined') {
+        docsify.afterEach(function() { trackPageView(); });
+        defined = true;
+      }
+      if (!defined) {
+        document.addEventListener('DOMContentLoaded', function() {
+          var defined2 = false;
+          if (typeof docsify !== 'undefined') {
+            docsify.afterEach(function() { trackPageView(); });
+            defined2 = true;
+          }
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
