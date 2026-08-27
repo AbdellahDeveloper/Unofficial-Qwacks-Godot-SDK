@@ -23,6 +23,17 @@ const PLAYER_EMAIL_VERIFY := "player/email/verify"
 static func player_name_available(name: String) -> String:
 	return "player/name-available?name=%s" % name.uri_encode()
 
+# Account linking — `provider` is a closed LoginType set (FlockCredentialProviders.to_wire), so no escaping needed.
+const PLAYER_ACCOUNTS := "player/accounts"
+const PLAYER_LINK_EMAIL := "player/link/email"
+const PLAYER_LINK_DEVICE := "player/link/device"
+
+static func player_link_oauth(provider: String) -> String:
+	return "player/link/oauth/%s" % provider
+
+static func player_unlink(provider: String) -> String:
+	return "player/unlink/%s" % provider
+
 # Player data / templates / bans
 const PLAYER_DATA := "player_data"
 const PLAYER_TEMPLATE := "player_template"
@@ -85,6 +96,48 @@ static func shop_items_by_shop(shop_id: String) -> String:
 
 static func player_inventory_by_player(player_id: String) -> String:
 	return "player_inventory/player/%s" % player_id
+
+static func player_inventory_consume(inventory_id: String) -> String:
+	return "player_inventory/%s/consume" % inventory_id
+
+# Leaderboards — read-only. There is no submit path by design: a board projects over a player-data field, so scores move by writing that field.
+# Every read is addressed by name — the /v1 surface has no by-id read routes.
+static func leaderboard_by_name(name: String) -> String:
+	return "leaderboard/by-name/%s" % name.uri_encode()
+
+static func leaderboard_standings(name: String) -> String:
+	return "%s/standings" % leaderboard_by_name(name)
+
+static func leaderboard_me(name: String) -> String:
+	return "%s/me" % leaderboard_by_name(name)
+
+static func leaderboard_around_me(name: String) -> String:
+	return "%s/around-me" % leaderboard_by_name(name)
+
+# Notifications — the player inbox plus game-scheduled reminders.
+const NOTIFICATION := "notification"
+const NOTIFICATION_UNREAD_COUNT := "notification/unread_count"
+const NOTIFICATION_SUMMARY := "notification/summary"
+const NOTIFICATION_READ_ALL := "notification/read_all"
+
+static func notification_read_by_id(notification_id: String) -> String:
+	return "notification/%s/read" % notification_id
+
+const DEVICE_TOKEN_REGISTER := "device_token/register"
+const DEVICE_TOKEN_UNREGISTER := "device_token/unregister"
+const NOTIFICATION_SCHEDULE := "notification/schedule"
+
+static func notification_schedule_by_id(scheduled_id: String) -> String:
+	return "notification/schedule/%s" % scheduled_id
+
+const NOTIFICATION_TEMPLATE := "notification_template"
+
+# Name rides in the query, not the path: template names carry spaces, colons and slashes, none of which survive a single path segment.
+static func notification_template_by_name(name: String, locale: String = "") -> String:
+	var query := "?name=%s" % name.uri_encode()
+	if not locale.is_empty():
+		query += "&locale=%s" % locale.uri_encode()
+	return "notification_template/by-name%s" % query
 
 # Assets
 const ASSET := "asset"

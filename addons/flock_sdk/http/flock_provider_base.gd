@@ -37,6 +37,11 @@ func delete_snapshot_category(category: String) -> void:
 		_client._snapshot_store.delete_scope(get_snapshot_scope(category))
 
 
+func delete_snapshot_category_except(category: String, keep_key_prefixes: Array) -> void:
+	if _client._snapshot_store:
+		_client._snapshot_store.delete_scope_except(get_snapshot_scope(category), keep_key_prefixes)
+
+
 func try_read_snapshot(category: String, key: String) -> Variant:
 	if _client._snapshot_store == null:
 		return null

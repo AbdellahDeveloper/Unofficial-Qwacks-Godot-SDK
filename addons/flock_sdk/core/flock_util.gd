@@ -18,6 +18,6 @@ static func flock_token_refresh_path() -> String:
 	return flock_data_dir().path_join("refresh_token")
 
 static func ensure_dir(path: String) -> void:
-	var dir := DirAccess.open(path.get_base_dir())
-	if dir and not dir.dir_exists(path.get_file()):
-		dir.make_dir_recursive(path)
+	if DirAccess.dir_exists_absolute(path):
+		return
+	DirAccess.make_dir_recursive_absolute(path)

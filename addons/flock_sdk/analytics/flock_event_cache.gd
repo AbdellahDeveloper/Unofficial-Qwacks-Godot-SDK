@@ -9,6 +9,8 @@ var _batch_size: int
 var _logger: FlockLogger
 var _flushing := false
 var _pending_count := 0
+# Bumped by clear(). A flush compares it before sending, so an erase abandons the batch in flight.
+var _epoch := 0
 
 func _init(directory: String, subfolder: String, max_events: int, batch_size: int, logger: FlockLogger) -> void:
 	_directory = directory.path_join(subfolder)
@@ -34,6 +36,7 @@ func enqueue(evt: Dictionary) -> String:
 
 	var file := FileAccess.open(tmp_path, FileAccess.WRITE)
 	if file == null:
+		_logger.log_warning("Event cache write failed, event dropped")
 		return ""
 	file.store_string(JSON.stringify(evt))
 	file.close()
@@ -41,11 +44,12 @@ func enqueue(evt: Dictionary) -> String:
 	# Atomic rename
 	var dir := DirAccess.open(_directory)
 	if dir:
-		dir.rename(name + TMP_EXTENSION, name + EXTENSION)
-		_pending_count += 1
-		_trim_oldest()
-		return final_path
+		if dir.rename(name + TMP_EXTENSION, name + EXTENSION) == OK:
+			_pending_count += 1
+			_trim_oldest()
+			return final_path
 
+	_logger.log_warning("Event cache write failed, event dropped")
 	return ""
 
 
@@ -64,8 +68,12 @@ func flush_async(sender: Callable) -> void:
 	_flushing = true
 
 	var ct := {}
+	var epoch := _epoch
 
 	while true:
+		# Erased since this flush started -> do not put it on the wire.
+		if _epoch != epoch:
+			break
 		var batch := _read_batch()
 		if batch.is_empty():
 			break
@@ -75,20 +83,42 @@ func flush_async(sender: Callable) -> void:
 			events.append(item.get("event", {}))
 
 		var result = await sender.call(events, ct)
+		# "defer" -> leave the files on disk and stop the flush loop; try again on the next trigger.
 		if result is String and result == "defer":
 			break
-
+		# Permanent rejection (or erasure mid-send) -> delete the batch and move on.
+		if result is Dictionary and result.has("error"):
+			if _outcome_is_permanent(result):
+				_logger.log_warning("Pending events batch dropped (HTTP %d): %s" % [
+					int(result.get("status_code", 0)), result.get("error", "")])
+			else:
+				# Transient (offline, 5xx, 401, timeout) — leave the files for the next attempt.
+				_logger.log_debug("Pending events flush deferred: %s" % result.get("error", ""))
+				break
 		_drop_batch(batch)
 
 	_flushing = false
 
 
 func clear() -> void:
+	# Bumped before the delete so an in-flight flush abandons the batch it already read.
+	_epoch += 1
 	for path in _enumerate_files():
 		var dir := DirAccess.open(path.get_base_dir())
 		if dir:
 			dir.remove(path.get_file())
 	_pending_count = 0
+
+
+# Mirrors the driver's classification: permanent 4xx (except 408/429) and a backend-coded 403 drop the
+# batch; 401 and a bare 403 (proxy/WAF) defer until conditions change.
+func _outcome_is_permanent(result: Dictionary) -> bool:
+	var status := int(result.get("status_code", -1))
+	if status == -1 or status == 401:
+		return false
+	if status == 403:
+		return not str(result.get("code", "")).is_empty()
+	return FlockException.FlockNetworkException.is_permanent_status(status)
 
 
 func _read_batch() -> Array:

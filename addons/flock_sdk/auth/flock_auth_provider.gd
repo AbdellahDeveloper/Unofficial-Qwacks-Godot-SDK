@@ -5,6 +5,10 @@ const PREF_KEY_AUTH_METHOD := "flock_auth_method"
 
 var _current_auth_method: String = ""
 
+# Best-effort: true once a linked-accounts read or an email link proves the account has an email credential.
+# Session-scoped, never persisted — false after a restore until the caller reads accounts.
+var _has_email_credential := false
+
 func _init(client: FlockClient) -> void:
 	super(client)
 
@@ -165,6 +169,132 @@ func is_name_available(name: String) -> Variant:
 	, "Name availability")
 
 
+# --- Account Linking ---
+
+func get_linked_accounts_async() -> Variant:
+	if not _require_authenticated_link():
+		return {"error": "No player is signed in"}
+	var response = await execute_async(func() -> Variant:
+		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.PLAYER_ACCOUNTS]
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
+	, "Linked accounts")
+	if response is Dictionary and response.has("error"):
+		return response
+	return _read_accounts(response)
+
+
+func link_email_async(email: String, password: String) -> Variant:
+	if not _require_authenticated_link():
+		return {"error": "No player is signed in"}
+	require_not_empty(email, "email")
+	require_not_empty(password, "password")
+	return await _link_async(FlockEndpoints.PLAYER_LINK_EMAIL,
+		AuthModels.link_email_request(email, password), AuthModels.PROVIDER_EMAIL, "Link email")
+
+
+func link_device_async(device_id: String) -> Variant:
+	if not _require_authenticated_link():
+		return {"error": "No player is signed in"}
+	require_not_empty(device_id, "device_id")
+	var device_type := OS.get_model_name() if OS.get_name() != "Windows" else OS.get_name()
+	return await _link_async(FlockEndpoints.PLAYER_LINK_DEVICE,
+		AuthModels.link_device_request(device_type, device_id), AuthModels.PROVIDER_DEVICE_ID, "Link device")
+
+
+func link_google_async(id_token: String) -> Variant:
+	return await _link_oauth_async(AuthModels.PROVIDER_GOOGLE, id_token, "Link Google")
+
+
+func link_apple_async(identity_token: String) -> Variant:
+	return await _link_oauth_async(AuthModels.PROVIDER_APPLE, identity_token, "Link Apple")
+
+
+func link_steam_async(session_ticket: String) -> Variant:
+	return await _link_oauth_async(AuthModels.PROVIDER_STEAM, session_ticket, "Link Steam")
+
+
+func link_facebook_async(facebook_token: String) -> Variant:
+	return await _link_oauth_async(AuthModels.PROVIDER_FACEBOOK, facebook_token, "Link Facebook")
+
+
+func link_discord_async(discord_token: String) -> Variant:
+	return await _link_oauth_async(AuthModels.PROVIDER_DISCORD, discord_token, "Link Discord")
+
+
+func unlink_async(provider: int) -> Variant:
+	if not _require_authenticated_link():
+		return {"error": "No player is signed in"}
+	var wire := AuthModels.provider_to_wire(provider)
+	if wire.is_empty():
+		return {"error": "'%d' is not a credential provider the SDK can send." % provider}
+	var response = await execute_async(func() -> Variant:
+		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.player_unlink(wire)]
+		# The backend expects an empty JSON object body even though there's nothing to send.
+		return await FlockHttpClient.post_async(url, {}, _client.get_base_headers(), -1.0, true)
+	, "Unlink %s" % wire, false)
+	if response is Dictionary and response.has("error"):
+		return response
+	var accounts = _read_accounts(response)
+	if accounts is Dictionary and accounts.has("error"):
+		return accounts
+	_client._logger.log_info("Unlinked %s from player: %s" % [wire, _client.current_player_id])
+	FlockEvents.get_instance().invoke_account_unlinked(provider)
+	return accounts
+
+
+func _link_oauth_async(provider: int, token: String, context: String) -> Variant:
+	if not _require_authenticated_link():
+		return {"error": "No player is signed in"}
+	require_not_empty(token, "token")
+	var wire := AuthModels.provider_to_wire(provider)
+	if wire.is_empty():
+		return {"error": "'%d' is not a credential provider the SDK can send." % provider}
+	return await _link_async(FlockEndpoints.player_link_oauth(wire),
+		AuthModels.link_oauth_request(token), provider, context)
+
+
+func _link_async(endpoint: String, body: Dictionary, provider: int, context: String) -> Variant:
+	var response = await execute_async(func() -> Variant:
+		var url := "%s/%s" % [_client.get_versioned_api_url(), endpoint]
+		return await FlockHttpClient.post_async(url, body, _client.get_base_headers())
+	, context, false)
+	if response is Dictionary and response.has("error"):
+		return response
+	var accounts = _read_accounts(response)
+	if accounts is Dictionary and accounts.has("error"):
+		return accounts
+	_client._logger.log_info("%s succeeded for player: %s" % [context, _client.current_player_id])
+	FlockEvents.get_instance().invoke_account_linked(provider)
+	return accounts
+
+
+# Reads the linked accounts array out of a raw /accounts or link response. Also tracks HasEmailCredential for
+# password-reset gating (the only session-scoped state account linking maintains).
+func _read_accounts(response: Variant) -> Variant:
+	if not response is Dictionary or not response.has("accounts"):
+		return {"error": "Invalid response from server (missing accounts)"}
+	var accounts: Array = response.get("accounts", [])
+	var has_email := false
+	var parsed: Array[Dictionary] = []
+	for account in accounts:
+		if not account is Dictionary:
+			continue
+		var linked := AuthModels.parse_linked_account(account)
+		if linked.get("provider_type", AuthModels.PROVIDER_UNKNOWN) == AuthModels.PROVIDER_EMAIL:
+			has_email = true
+		parsed.append(linked)
+	_has_email_credential = has_email
+	return parsed
+
+
+# Like _require_authenticated but returns bool instead of just push_error'ing — the error-path style used by account linking.
+func _require_authenticated_link() -> bool:
+	if _client.is_authenticated:
+		return true
+	push_error("[Flock SDK] No player is signed in")
+	return false
+
+
 # --- Session Restore ---
 
 func try_restore_session() -> bool:
@@ -190,6 +320,7 @@ func _restore_session_core() -> bool:
 
 	_client._logger.log_info("Restored session for PlayerId: %s" % _client.current_player_id)
 	_current_auth_method = _load_persisted_auth_method()
+	_has_email_credential = false
 	if _current_auth_method.is_empty():
 		_current_auth_method = "SessionRestore"
 
@@ -207,6 +338,7 @@ func _restore_session_core() -> bool:
 func logout() -> void:
 	var was_authenticated := _client.is_authenticated
 	_current_auth_method = ""
+	_has_email_credential = false
 	_persist_auth_method("")
 	_client.clear_tokens()
 	if was_authenticated:
@@ -237,6 +369,14 @@ func _execute_auth(request: Dictionary, context: String, method: String, endpoin
 	)
 
 	if result is Dictionary and result.has("error"):
+		# The credential decides what a login failure means, so refine the HTTP layer's context-free hint here.
+		result["operation"] = context
+		var refined := FlockErrorHints.for_auth(FlockErrorCodes.parse(str(result.get("code", ""))), method)
+		if not refined.is_empty():
+			result["hint"] = refined
+		result["error"] = FlockErrorHints.compose(context, str(result.get("server_message", "")),
+			str(result.get("code", "")), int(result.get("status_code", -1)),
+			str(result.get("hint", "")), str(result["error"]))
 		_client._logger.log_error("%s failed: %s" % [context, result.get("error", "")])
 		return result
 
@@ -248,6 +388,7 @@ func _execute_auth(request: Dictionary, context: String, method: String, endpoin
 
 		_client.set_tokens(access_token, response.get("refresh_token", ""))
 		_current_auth_method = method
+		_has_email_credential = false
 		_persist_auth_method(method)
 		_client._logger.log_info("%s successful for player: %s" % [context, _client.current_player_id])
 
@@ -299,8 +440,8 @@ func _require_authenticated() -> void:
 
 func _require_email_login() -> void:
 	_require_authenticated()
-	if _current_auth_method != "Email":
-		push_error("[Flock SDK] Password reset requires being signed in with email")
+	if _current_auth_method != "Email" and not _has_email_credential:
+		push_error("[Flock SDK] Password reset requires an email credential on this account")
 
 
 func _persist_auth_method(method: String) -> void:

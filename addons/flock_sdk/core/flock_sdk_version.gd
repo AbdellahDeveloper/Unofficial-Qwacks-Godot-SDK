@@ -1,3 +1,3 @@
 class_name FlockSdkVersion
 
-const CURRENT := "1.28.0"
+const CURRENT := "1.37.0"

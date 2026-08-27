@@ -29,6 +29,8 @@ var player: RefCounted = null
 var commands: RefCounted = null
 var shop: RefCounted = null
 var asset: RefCounted = null
+var leaderboard: RefCounted = null
+var notification: RefCounted = null
 var analytics: RefCounted = null
 var session: FlockSession = null
 
@@ -75,7 +77,7 @@ func create(init_config: FlockInitConfig, logger: FlockLogger = null) -> void:
 		return
 
 	_init_config = init_config
-	_logger = logger if logger != null else (GodotFlockLogger.new() if init_config.enable_debug_logs else NullFlockLogger.new())
+	_logger = logger if logger != null else (GodotFlockLogger.new(init_config.enable_debug_logs) if init_config.enable_debug_logs else NullFlockLogger.new())
 
 	# Set events logger
 	FlockEvents.get_instance()._logger = _logger
@@ -116,6 +118,8 @@ func _init_services() -> void:
 	commands = FlockCommandProvider.new(self)
 	shop = FlockShopProvider.new(self)
 	asset = FlockAssetProvider.new(self)
+	leaderboard = FlockLeaderboardProvider.new(self)
+	notification = FlockNotificationProvider.new(self)
 	auth = FlockAuthProvider.new(self)
 
 	# Initialize analytics

@@ -55,6 +55,14 @@ var is_active: bool:
 	get:
 		return _active
 
+# Set from inside on_session_ended when the handler could not persist the end durably.
+var _end_spool_failed := false
+
+
+# Called by the end handler when spooling failed, so end() keeps the live marker.
+func report_end_spool_failed() -> void:
+	_end_spool_failed = true
+
 var elapsed_seconds: float:
 	get:
 		var raw := 0.0
@@ -156,8 +164,14 @@ func end(reason: String) -> FlockSessionSnapshot:
 	var snapshot := take_snapshot()
 	snapshot.is_bounce = snapshot.duration_seconds < _config.bounce_threshold_seconds
 
+	# Spool-before-clear: only drop the live marker once the handler says it persisted the end.
+	_end_spool_failed = false
 	on_session_ended.emit(snapshot)
-	_clear_persisted_state()
+
+	if _end_spool_failed:
+		_logger.log_error("Session end %s was not spooled — keeping the live marker for next-launch recovery." % session_id)
+	else:
+		_clear_persisted_state()
 
 	_logger.log_info("Session ended: %s | Duration: %.1fs | Screens: %d | Pauses: %d | AvgFPS: %.0f%s" % [
 		session_id, snapshot.duration_seconds, snapshot.screens_viewed,
@@ -290,8 +304,14 @@ func _end(reason: String) -> FlockSessionSnapshot:
 	var snapshot := take_snapshot()
 	snapshot.is_bounce = snapshot.duration_seconds < _config.bounce_threshold_seconds
 
+	# Spool-before-clear: only drop the live marker once the handler says it persisted the end.
+	_end_spool_failed = false
 	on_session_ended.emit(snapshot)
-	_clear_persisted_state()
+
+	if _end_spool_failed:
+		_logger.log_error("Session end %s was not spooled — keeping the live marker for next-launch recovery." % session_id)
+	else:
+		_clear_persisted_state()
 
 	_logger.log_info("Session ended: %s | Duration: %.1fs | Screens: %d | Pauses: %d | AvgFPS: %.0f%s" % [
 		session_id, snapshot.duration_seconds, snapshot.screens_viewed,

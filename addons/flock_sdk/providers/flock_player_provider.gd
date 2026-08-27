@@ -36,6 +36,19 @@ func apply_server_player_data(data: Dictionary) -> void:
 		by_template[template_id] = data
 
 
+# Evicts the cached row whose id matches, so the next read refetches authoritative state. No-op when the
+# row isn't cached (incl. after logout — auth cleared the cache).
+func evict_player_cache_by_row(player_data_id: String) -> void:
+	if player_data_id.is_empty():
+		return
+	for player_key in _player_data_by_player:
+		var by_template: Dictionary = _player_data_by_player[player_key]
+		for template_id in by_template.keys():
+			var row: Variant = by_template[template_id]
+			if row is Dictionary and row.get("id", "") == player_data_id:
+				by_template.erase(template_id)
+
+
 func get_all_data_async(player_id: String = "", page: int = 1, limit: int = 100) -> Variant:
 	return await execute_async(func() -> Variant:
 		var url := "%s/%s?page=%d&limit=%d" % [_client.get_versioned_api_url(), FlockEndpoints.PLAYER_DATA, page, limit]

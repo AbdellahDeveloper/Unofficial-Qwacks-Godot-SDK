@@ -2,7 +2,7 @@
 
 A pure GDScript implementation of the [Qwacks](https://qwacks.com) game backend SDK for **Godot 4.x**.
 
-> **Version 1.28.0** — Ported from the official C# Unity SDK.
+> **Version 1.37.0** — Ported from the official C# Unity SDK.
 
 [![Godot 4.x](https://img.shields.io/badge/Godot-4.x-blue)](https://godotengine.org)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
@@ -14,14 +14,16 @@ A pure GDScript implementation of the [Qwacks](https://qwacks.com) game backend 
 
 This SDK connects your Godot game to the [Qwacks](https://qwacks.com) backend platform, providing:
 
-- **Authentication** — Email, Device, Google, Apple, Steam, Facebook, Discord
+- **Authentication** — Email, Device, Google, Apple, Steam, Facebook, Discord, account linking
 - **Player Data** — CRUD operations on player templates with offline caching
 - **Game Config** — Remote configuration with live patching
-- **Shop** — In-game shop with item purchases and inventory
+- **Shop** — In-game shop with item purchases, rewards, inventory, and consumption
 - **Assets** — Remote asset management with local caching
-- **Commands** — Player data updates, currency, achievements
-- **Analytics** — Session tracking, events, transactions, error logging
-- **Offline Support** — Automatic caching and write queuing when offline
+- **Commands** — Player data updates, currency, achievements, offline write queue
+- **Leaderboards** — Global/windowed standings, ranks, and player neighborhoods by board name
+- **Notifications** — In-app mailbox, unread badge, templates, and scheduled notifications
+- **Analytics** — Session tracking, events, transactions, error logging, consent management
+- **Offline Support** — Automatic caching and durable write queuing when offline
 
 ## Quick Setup
 
