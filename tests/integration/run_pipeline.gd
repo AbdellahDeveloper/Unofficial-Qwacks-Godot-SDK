@@ -235,7 +235,8 @@ func _check_leaderboard_infra() -> void:
 		_infra_notes.append("MISSING  leaderboard named '%s'.\n" % name \
 			+ "         Game -> Leaderboards -> New -> name '%s'; publish it to this game version." % name)
 		return
-	_infra_report("leaderboard", true, "leaderboard '%s' exists" % name)
+	var standings = await _client.leaderboard.get_standings_async(name)
+	_infra_report("leaderboard", true, "leaderboard '%s' exists — %s" % [name, _standings_summary(standings)])
 
 
 func _check_game_config_infra() -> void:
@@ -373,7 +374,7 @@ func _phase_leaderboard() -> bool:
 	if _is_error(standings):
 		_report("leaderboard standings", false, str(standings.get("error", "")))
 		return false
-	_report("leaderboard standings", true, "read standings for '%s'" % name)
+	_report("leaderboard standings", true, "standings for '%s' (%s)" % [name, _standings_summary(standings)])
 	var my_rank = await _client.leaderboard.get_my_rank_async(name)
 	if _is_error(my_rank):
 		_report("leaderboard my_rank", false, str(my_rank.get("error", "")))
@@ -464,6 +465,33 @@ func _field_value_int(data_fields: Variant, field_name: String) -> int:
 			var value: Variant = entry.get("value", 0)
 			return int(value) if value is int or value is float or (value is String and value.is_valid_int()) else 0
 	return 0
+
+
+# Human-readable proof the ranked data is real: total entries plus the top standing.
+func _standings_summary(result: Variant) -> String:
+	if result is Dictionary:
+		var items: Variant = result.get("items", [])
+		if items is Array and items.size() > 0:
+			var first: Variant = items[0]
+			if first is Dictionary:
+				var label := str(first.get("player_name", ""))
+				if label.is_empty():
+					label = str(first.get("player_id", ""))
+				return "%s entries, top: rank %s '%s' score %s" % [
+					_fmt_num(result.get("total", items.size())),
+					_fmt_num(first.get("rank", "")),
+					label,
+					_fmt_num(first.get("score", "")),
+				]
+		return "%s entries, none ranked yet" % _fmt_num(result.get("total", 0))
+	return "no standings data"
+
+
+# JSON numbers arrive as floats; drop the ".0" for whole values.
+static func _fmt_num(v: Variant) -> String:
+	if v is float and v == round(v):
+		return str(int(v))
+	return str(v)
 
 
 func _best_effort_revoke() -> void:
