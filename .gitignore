@@ -27,3 +27,6 @@ export/
 # Docs
 docs/node_modules/
 docs/.deprecated/
+
+# Real-credentials integration secrets (never commit)
+tests/integration/secrets.cfg

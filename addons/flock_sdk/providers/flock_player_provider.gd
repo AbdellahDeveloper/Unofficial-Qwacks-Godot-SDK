@@ -106,18 +106,28 @@ func _fetch_all_templates() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.PLAYER_TEMPLATE]
 		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch player templates")
+	# The transport unwraps the v1 envelope, so "result" arrives as a bare array of template dicts. Defensive
+	# paths may still hand back a paginated {"items": [...]} dictionary — accept both shapes.
+	if response is Array:
+		_cache_templates(response)
+		return response
 	if response is Dictionary and response.has("items"):
-		var items: Array = response.get("items", [])
-		_templates_by_id.clear()
-		_template_id_by_name.clear()
-		for item: Dictionary in items:
-			var id: String = item.get("id", "")
-			if not id.is_empty():
-				_templates_by_id[id] = item
-				_template_id_by_name[item.get("tag", "")] = id
-		_all_templates_fetched = true
-		return items
+		_cache_templates(response.get("items", []))
+		return response.get("items", [])
 	return response
+
+
+func _cache_templates(items: Variant) -> void:
+	_templates_by_id.clear()
+	_template_id_by_name.clear()
+	for item in items:
+		if not item is Dictionary:
+			continue
+		var id: String = item.get("id", "")
+		if not id.is_empty():
+			_templates_by_id[id] = item
+			_template_id_by_name[item.get("tag", "")] = id
+	_all_templates_fetched = true
 
 
 func _get_or_fetch_by_template(player_id: String) -> Variant:

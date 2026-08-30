@@ -51,13 +51,7 @@ func get_unread_count_async() -> Variant:
 
 	var result = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, _player_scoped_key("unread_count"), func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.NOTIFICATION_UNREAD_COUNT]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		var count_data: Dictionary = GenericResponseModels.get_result(response)
-		if count_data == null:
-			return {"error": "Invalid response from server (missing count)"}
-		return count_data
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch unread notification count")
 
 	if result is Dictionary:
@@ -75,13 +69,7 @@ func get_summary_async(limit: int = 10) -> Variant:
 
 	var result = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, _player_scoped_key("summary_l%d" % limit), func() -> Variant:
 		var url := "%s/%s?limit=%d" % [_client.get_versioned_api_url(), FlockEndpoints.NOTIFICATION_SUMMARY, limit]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		var summary: Dictionary = GenericResponseModels.get_result(response)
-		if summary == null:
-			return {"error": "Invalid response from server (missing summary)"}
-		return summary
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch notification summary")
 
 	if result is Dictionary and not result.has("error"):
@@ -100,10 +88,7 @@ func mark_read_async(notification: Variant) -> Variant:
 
 	return await execute_async(func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.notification_read_by_id(str(notification))]
-		var response = await FlockHttpClient.post_async(url, {}, _client.get_base_headers(), -1.0, true)
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.post_async(url, {}, _client.get_base_headers(), -1.0, true)
 	, "Mark notification read")
 
 
@@ -114,13 +99,7 @@ func mark_all_read_async() -> Variant:
 
 	var result = await execute_async(func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.NOTIFICATION_READ_ALL]
-		var response = await FlockHttpClient.post_async(url, {}, _client.get_base_headers(), -1.0, true)
-		if response is Dictionary and response.has("error"):
-			return response
-		var data: Dictionary = GenericResponseModels.get_result(response)
-		if data == null:
-			return {"error": "Invalid response from server (missing result)"}
-		return data
+		return await FlockHttpClient.post_async(url, {}, _client.get_base_headers(), -1.0, true)
 	, "Mark all notifications read")
 
 	if result is Dictionary:
@@ -151,10 +130,7 @@ func register_device_token_async(token: String, platform: int = -1) -> Variant:
 
 	return await execute_async(func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.DEVICE_TOKEN_REGISTER]
-		var response = await FlockHttpClient.post_async(url, request, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.post_async(url, request, _client.get_base_headers())
 	, "Register device token")
 
 
@@ -168,13 +144,7 @@ func unregister_device_token_async(token: String) -> Variant:
 	var request := {"token": token}
 	var result = await execute_async(func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.DEVICE_TOKEN_UNREGISTER]
-		var response = await FlockHttpClient.post_async(url, request, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		var data: Dictionary = GenericResponseModels.get_result(response)
-		if data == null:
-			return {"error": "Invalid response from server (missing result)"}
-		return data
+		return await FlockHttpClient.post_async(url, request, _client.get_base_headers())
 	, "Unregister device token")
 
 	if result is Dictionary:
@@ -202,10 +172,7 @@ func _current_device_platform() -> Dictionary:
 func get_templates_async() -> Variant:
 	return await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, "templates", func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.NOTIFICATION_TEMPLATE]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch notification templates")
 
 
@@ -220,10 +187,7 @@ func get_template_by_name_async(template_name: String, locale: String = "") -> V
 
 	var template = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, "template_name_%s_%s" % [template_name, locale], func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.notification_template_by_name(template_name, locale)]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch notification template")
 
 	if template is Dictionary and not str(template.get("id", "")).is_empty():
@@ -270,10 +234,7 @@ func schedule_async(template_name: String, deliver_at_utc: String, variables: Di
 
 	var scheduled = await execute_async(func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.NOTIFICATION_SCHEDULE]
-		var response = await FlockHttpClient.post_async(url, request, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.post_async(url, request, _client.get_base_headers())
 	# Not idempotent: a re-sent schedule after an ambiguous failure creates a second reminder the game
 	# can't cancel, because it only ever learns one scheduled id. Surface the failure instead.
 	, "Schedule notification", false)
@@ -374,10 +335,7 @@ func cancel_scheduled_async(scheduled: Variant) -> Variant:
 
 	var cancelled = await execute_async(func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.notification_schedule_by_id(str(scheduled))]
-		var response = await FlockHttpClient.delete_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.delete_async(url, _client.get_base_headers())
 	, "Cancel scheduled notification", false)
 
 	if cancelled is Dictionary and cancelled.has("error"):

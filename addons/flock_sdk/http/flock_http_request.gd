@@ -67,6 +67,31 @@ func _describe_field_errors(errors: Array) -> String:
 	return "; ".join(parts)
 
 
+# v1 responses (except auth) come back wrapped as {"error": {"code": null}, "response": {...}, "result": <data>}.
+# On 2xx the "error" member is always present but is a null-code success marker, NOT a failure. Many providers
+# treat any "error" key as a failure, so unwrap the whole envelope to the real payload ("result") instead and
+# shut the door behind us: providers and callers both just see the data. A genuine error path never carries a
+# "result" key, so transport error dicts keep their shape and pass through untouched.
+static func is_marker_error(err: Variant) -> bool:
+	if err == null:
+		return true
+	if err is Dictionary:
+		for key in err:
+			var val: Variant = err[key]
+			if val != null and not (val is String and (val as String).is_empty()):
+				return false
+		return true
+	return false
+
+
+static func normalize_success_body(parsed: Variant) -> Variant:
+	if parsed is Dictionary and parsed.has("result"):
+		var err: Variant = parsed.get("error", null)
+		if err == null or is_marker_error(err):
+			return parsed["result"]
+	return parsed
+
+
 static func _join_location(location) -> String:
 	if not location is Array or location.size() == 0:
 		return ""
@@ -110,6 +135,11 @@ func _send_async(method: String, url: String, headers: Dictionary, body: String)
 
 	var body_text := response_body.get_string_from_utf8()
 
+	# Any completed HTTP transaction (even a 4xx/5xx) proves the server was reachable; a transport-level
+	# RESULT_* failure means it wasn't. Desktop builds can't rely on OS.has_feature("online"), so this is
+	# how is_reachable() learns the truth.
+	FlockHttpClient._report_outcome(response_code_http == HTTPRequest.RESULT_SUCCESS)
+
 	# Check for transport errors
 	if response_code_http == HTTPRequest.RESULT_SUCCESS:
 		if response_code >= 200 and response_code < 300:
@@ -118,7 +148,7 @@ func _send_async(method: String, url: String, headers: Dictionary, body: String)
 			var parsed = JSON.parse_string(body_text)
 			if parsed == null:
 				return {"error": "Failed to parse response JSON"}
-			return parsed
+			return normalize_success_body(parsed)
 		else:
 			var detail := _parse_error_detail(body_text)
 			var error_code: String = detail.get("code", "")

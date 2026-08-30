@@ -1,0 +1,16 @@
+; Engine configuration file.
+; This project exists so the SDK repo itself can be run headless for tests:
+;   godot --headless --path . --import
+;   godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gexit
+;   godot --headless -s res://tests/integration/run_pipeline.gd
+config_version=5
+
+[application]
+
+config/name="Flock SDK (Godot)"
+config/features=PackedStringArray("4.7")
+run/main_scene=""
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/flock_sdk/plugin.cfg", "res://addons/gut/plugin.cfg")

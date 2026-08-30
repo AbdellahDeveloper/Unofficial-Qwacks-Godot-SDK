@@ -20,6 +20,7 @@ var _token_claims: Dictionary = {}
 var _refresh_mutex: Mutex = Mutex.new()
 var _refresh_generation: int = 0
 var _snapshot_store: RefCounted = null
+var _network_reachable := true
 
 # Providers
 var auth: RefCounted = null
@@ -102,6 +103,9 @@ func create(init_config: FlockInitConfig, logger: FlockLogger = null) -> void:
 
 	# Initialize services
 	_init_services()
+
+	# The transport reports its outcomes so is_reachable() reflects reality on non-Web builds.
+	FlockHttpClient.set_outcome_listener(_on_http_outcome)
 
 	FlockEvents.get_instance().invoke_initialized()
 	_logger.log_info("Flock SDK initialized successfully")
@@ -208,7 +212,14 @@ func get_versioned_api_url() -> String:
 
 
 func is_reachable() -> bool:
-	return OS.has_feature("online")
+	# "online" is a browser-only feature tag; desktop builds report false even with a working
+	# connection. There, trust the last outcome the transport actually observed — otherwise every
+	# command write is stranded in the offline queue.
+	return OS.has_feature("online") or _network_reachable
+
+
+func _on_http_outcome(reachable: bool) -> void:
+	_network_reachable = reachable
 
 
 # --- Token Refresh ---
