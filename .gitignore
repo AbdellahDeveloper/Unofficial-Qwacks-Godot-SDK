@@ -30,3 +30,6 @@ docs/.deprecated/
 
 # Real-credentials integration secrets (never commit)
 tests/integration/secrets.cfg
+
+# Flock Config Codegen output (regenerate in consumer projects)
+/flock/generated/
