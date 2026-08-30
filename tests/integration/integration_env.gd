@@ -24,7 +24,7 @@ const ENV_KEYS := [
 	"device_id", "player_name",
 	"run_phases",
 	"currency_template_tag", "currency_fields",
-	"achievement_template_tag", "achievement_name",
+	"achievement_name",
 	"notification_template",
 	"shop_item_id",
 	"leaderboard_name",

@@ -1,9 +1,19 @@
 class_name FlockHttpClient
 
 static var _default_timeout: float = 30.0
+# Single static listener: the transport reports whether a request actually reached the server so
+# desktop builds (where OS.has_feature("online") is meaningless) don't treat every write as offline.
+static var _outcome_listener: Callable = Callable()
 
 static func configure(timeout: float) -> void:
 	_default_timeout = timeout
+
+static func set_outcome_listener(callable: Callable) -> void:
+	_outcome_listener = callable
+
+static func _report_outcome(reachable: bool) -> void:
+	if _outcome_listener.is_valid():
+		_outcome_listener.call(reachable)
 
 
 static func get_async(url: String, headers: Dictionary = {}, timeout: float = -1.0) -> Variant:

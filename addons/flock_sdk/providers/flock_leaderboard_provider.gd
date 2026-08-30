@@ -24,10 +24,7 @@ func get_by_name_async(leaderboard_name: String) -> Variant:
 
 	var board = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, "board_name_%s" % leaderboard_name, func() -> Variant:
 		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.leaderboard_by_name(leaderboard_name)]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch leaderboard")
 
 	if board is Dictionary and not board.has("error") and not str(board.get("id", "")).is_empty():
@@ -56,10 +53,7 @@ func get_standings_async(leaderboard_name: String, window: String = "", country:
 
 	var result = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, "standings_%s_%s_%s_p%d_l%d" % [leaderboard_name, window, country, page, limit], func() -> Variant:
 		var url := "%s/%s%s" % [_client.get_versioned_api_url(), FlockEndpoints.leaderboard_standings(leaderboard_name), query]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch leaderboard standings")
 
 	return _as_caller_mistake_or(result, leaderboard_name)
@@ -78,10 +72,7 @@ func get_my_rank_async(leaderboard_name: String, window: String = "", country: S
 
 	var result = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, _player_scoped_key("me_%s_%s_%s" % [leaderboard_name, window, country]), func() -> Variant:
 		var url := "%s/%s%s" % [_client.get_versioned_api_url(), FlockEndpoints.leaderboard_me(leaderboard_name), query]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch player rank")
 
 	return _as_caller_mistake_or(result, leaderboard_name)
@@ -101,10 +92,7 @@ func get_around_me_async(leaderboard_name: String, neighbours: int = 5, window: 
 
 	var result = await fetch_with_snapshot_async(SNAPSHOT_CATEGORY, _player_scoped_key("around_%s_%s_%s_n%d" % [leaderboard_name, window, country, neighbours]), func() -> Variant:
 		var url := "%s/%s%s" % [_client.get_versioned_api_url(), FlockEndpoints.leaderboard_around_me(leaderboard_name), query]
-		var response = await FlockHttpClient.get_async(url, _client.get_base_headers())
-		if response is Dictionary and response.has("error"):
-			return response
-		return GenericResponseModels.get_result(response)
+		return await FlockHttpClient.get_async(url, _client.get_base_headers())
 	, "Fetch standings around player")
 
 	return _as_caller_mistake_or(result, leaderboard_name)

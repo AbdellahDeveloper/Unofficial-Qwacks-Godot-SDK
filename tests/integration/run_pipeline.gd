@@ -184,12 +184,15 @@ func _check_currency_infra() -> void:
 
 
 func _check_achievement_infra() -> void:
-	var tag := str(_cfg.get("achievement_template_tag", "achievement"))
+	# The unlock command reads the player's achievement row by the canonical tag "achievement"
+	# (the tag Content -> Achievement Config auto-creates), so infra must check exactly that tag.
+	var tag := "achievement"
 	var template = await _client.player.get_template_by_tag_async(tag)
 	if _is_error(template) or template.is_empty():
 		_infra_report("achievement", false, "template (tag '%s') NOT found" % tag)
 		_infra_notes.append("MISSING  achievement player-data template tagged '%s'.\n" % tag \
-			+ "         Game -> Player Data -> Templates -> New -> tag '%s'." % tag)
+			+ "         Content -> Achievement Config creates it automatically (tag '%s').\n" % tag \
+			+ "         Alternatively: Game -> Player Data -> Templates -> New -> tag '%s'." % tag)
 		return
 	var name := str(_cfg.get("achievement_name", ""))
 	if name.is_empty():
@@ -199,7 +202,7 @@ func _check_achievement_infra() -> void:
 	if not schema_keys.has(name):
 		_infra_report("achievement", false, "achievement '%s' not a member of template '%s' (has %s)" % [name, str(template.get("name", tag)), str(schema_keys)])
 		_infra_notes.append("MISSING  achievement '%s' is not in template '%s'.\n" % [name, str(template.get("name", tag))] \
-			+ "         Add it as a member of that template (schema), it will be picked up on sync.\n" \
+			+ "         Add it under Content -> Achievement Config; the name must match %s exactly.\n" % name \
 			+ "         Current members: %s" % str(schema_keys))
 		return
 	_infra_report("achievement", true, "template '%s' contains achievement '%s'" % [str(template.get("name", tag)), name])
@@ -290,6 +293,9 @@ func _phase_update_currency() -> bool:
 
 	var new_value := current + 100
 	var updated = await _client.commands.update_player_data_field_async(wallet_id, field, new_value)
+	if _is_offline_queued(updated):
+		_report("update_player_data_field", false, "queued offline — the pipeline requires a live round-trip")
+		return false
 	if _is_error(updated):
 		_report("update_player_data_field", false, str(updated.get("error", "")))
 		return false
@@ -312,10 +318,26 @@ func _phase_achievement() -> bool:
 	print("PHASE 2/3  UPDATE  unlock achievement '%s'" % name)
 	print("---")
 	var result = await _client.commands.unlock_achievement_async(name)
+	if _is_offline_queued(result):
+		_report("unlock_achievement", false, "queued offline — the pipeline requires a live round-trip")
+		return false
 	if _is_error(result):
 		_report("unlock_achievement", false, str(result.get("error", "")))
 		return false
-	_report("unlock_achievement", true, "unlocked '%s'" % name)
+	_report("unlock_achievement", true, "unlocked '%s' (server confirm: %s)" % [name, str(result)])
+
+	# Read back all achievements: the "achievement" template schema enumerates every one, the player's
+	# row (fetched fresh, bypassing the pre-unlock cache) holds which are actually unlocked.
+	var row = await _client.player.get_my_data_by_tag_async("achievement")
+	if _is_error(row) or row.is_empty():
+		_report("achievements readback", false, "no achievement row for the test player")
+		return false
+	var fresh = await _client.player.get_data_by_id_async(str(row.get("id", "")))
+	if _is_error(fresh):
+		_report("achievements readback", false, str(fresh.get("error", "")))
+		return false
+	var template = await _client.player.get_template_by_tag_async("achievement")
+	_report("achievements readback", true, _achievements_summary(template, fresh))
 	return true
 
 
@@ -465,6 +487,43 @@ func _field_value_int(data_fields: Variant, field_name: String) -> int:
 			var value: Variant = entry.get("value", 0)
 			return int(value) if value is int or value is float or (value is String and value.is_valid_int()) else 0
 	return 0
+
+
+# True when the player-data field reads as unlocked: a bool true, a non-zero number, or a non-empty string.
+func _field_bool_true(data_fields: Variant, field_name: String) -> bool:
+	if data_fields is Dictionary:
+		return bool(data_fields.get(field_name, false))
+	for entry in data_fields:
+		if entry is Dictionary and str(entry.get("field_name", "")) == field_name:
+			var value: Variant = entry.get("value", false)
+			if value is bool:
+				return value
+			if value is int or value is float:
+				return value != 0
+			if value is String:
+				return not (value as String).is_empty()
+			if value is Dictionary:
+				return not (value as Dictionary).is_empty()
+	return false
+
+
+# Human-readable proof the unlock landed: how many of the template's achievements are unlocked, listing them all.
+func _achievements_summary(template: Variant, row: Variant) -> String:
+	var names := _schema_keys(template.get("schema", []) if template is Dictionary else [])
+	if names.is_empty():
+		return "no achievements defined in the 'achievement' template schema"
+	var unlocked: Array = []
+	var data: Variant = row.get("data", []) if row is Dictionary else null
+	for achievement in names:
+		if data != null and _field_bool_true(data, achievement):
+			unlocked.append(achievement)
+	return "%d/%d achievements unlocked; all: %s" % [unlocked.size(), names.size(), ", ".join(names)]
+
+
+# The SDK queues command writes when it believes the device is offline. The pipeline exists to prove
+# LIVE round-trips, so a queued write is a failure, not a pass.
+func _is_offline_queued(result: Variant) -> bool:
+	return result is Dictionary and bool(result.get("offline", false))
 
 
 # Human-readable proof the ranked data is real: total entries plus the top standing.
