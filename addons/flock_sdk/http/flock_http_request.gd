@@ -67,6 +67,29 @@ func _describe_field_errors(errors: Array) -> String:
 	return "; ".join(parts)
 
 
+# v1 responses (except auth) come back wrapped as {"error": {"code": null}, "response": {...}, "result": <data>}.
+# On 2xx the "error" member is always present but is a null-code success marker, NOT a failure. Many providers
+# treat any "error" key as a failure, so drop the marker here and let their existing get_result()/parse paths run.
+static func is_marker_error(err: Variant) -> bool:
+	if err == null:
+		return true
+	if err is Dictionary:
+		for key in err:
+			var val: Variant = err[key]
+			if val != null and not (val is String and (val as String).is_empty()):
+				return false
+		return true
+	return false
+
+
+static func normalize_success_body(parsed: Variant) -> Variant:
+	if parsed is Dictionary and parsed.has("error") and is_marker_error(parsed["error"]):
+		var cleaned: Dictionary = parsed.duplicate()
+		cleaned.erase("error")
+		return cleaned
+	return parsed
+
+
 static func _join_location(location) -> String:
 	if not location is Array or location.size() == 0:
 		return ""
@@ -118,7 +141,7 @@ func _send_async(method: String, url: String, headers: Dictionary, body: String)
 			var parsed = JSON.parse_string(body_text)
 			if parsed == null:
 				return {"error": "Failed to parse response JSON"}
-			return parsed
+			return normalize_success_body(parsed)
 		else:
 			var detail := _parse_error_detail(body_text)
 			var error_code: String = detail.get("code", "")

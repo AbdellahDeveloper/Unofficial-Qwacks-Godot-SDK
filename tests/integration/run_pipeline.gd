@@ -407,8 +407,10 @@ func _phase_delete_device() -> bool:
 	if _is_error(result):
 		_report("revoke token", false, str(result.get("error", "")))
 		return false
+	# revoke_token() only revokes server-side; the SDK keeps local sessions until the caller clears them.
+	_client.clear_tokens()
 	if _client.is_authenticated:
-		_report("revoke token", false, "still authenticated after revoke")
+		_report("revoke token", false, "still authenticated after revoke + clear_tokens")
 		return false
 	_report("revoke token", true, "token revoked; test player %s left as a disposable account" % _player_id)
 	return true
@@ -467,6 +469,7 @@ func _field_value_int(data_fields: Variant, field_name: String) -> int:
 func _best_effort_revoke() -> void:
 	if _client and _client.is_authenticated:
 		await _client.auth.revoke_token()
+		_client.clear_tokens()
 
 
 func _print_banner() -> void:
