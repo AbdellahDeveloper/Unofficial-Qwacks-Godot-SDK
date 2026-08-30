@@ -98,6 +98,46 @@ if result is Dictionary and not result.has("error"):
     print("Logged in!")
 ```
 
+## Testing
+
+The SDK repo ships with unit tests and a real-credentials integration pipeline.
+
+### One-time import
+
+First-time only — registers the SDK/GUT scripts so `class_name` globals resolve:
+
+```
+godot --headless --path . --import
+```
+
+### Unit tests (GUT)
+
+Runs all unit tests headless and exits `0` on success (gives a non-zero code on failure):
+
+```
+godot --headless -s addons/gut/gut_cmdln.gd -gdir=res://tests/ -gexit
+```
+
+The bundled [GUT](https://gut.readthedocs.io/en/v9.7.1/) addon (`addons/gut/`) targets Godot 4.7.x. Unit tests live under `res://tests/unit/` and cover models, error hints/hints composition, the offline command classifier, event cache, snapshot store, pending writes, session snapshots, logger severity, and SDK version consistency. Integration scripts are discovered too but stay `PENDING` until credentials are configured, so the command above passes in CI.
+
+### Real-credentials integration pipeline
+
+A dedicated runner (not a GUT test) that exercises the SDK against the live backend in a strict `CREATE → UPDATE → DELETE` order and, before running, verifies every template/member the configured phases need — printing exact setup instructions for anything missing:
+
+```
+godot --headless -s res://tests/integration/run_pipeline.gd
+```
+
+Provide credentials via environment variables:
+
+```
+FLOCK_GAME_ID=... FLOCK_GAME_VERSION_ID=... FLOCK_API_KEY=... godot --headless -s res://tests/integration/run_pipeline.gd
+```
+
+or copy `tests/integration/secrets.cfg.example` to `tests/integration/secrets.cfg` (gitignored) and fill it in.
+
+The pipeline is driven by the `[pipeline]` section: `run_phases` selects which phases to run (`device,currency` by default; optional `achievement`, `notification`, `shop`, `leaderboard`, `game_config`), and each phase's template names/members are declared there. The INFRA step checks each one on the backend and, when something is missing, lists exactly what to create (e.g. "currency template exists but is missing fields ['gold']"). Exit codes: `0` all passed, `1` runtime failure, `2` credentials missing, `3` prerequisites missing. See `tests/integration/secrets.cfg.example` for the full field-by-field checklist.
+
 ## Documentation
 
 Full documentation is available at: **[unofficial-qwacks-godot-sdk.github.io/qwacks-godot-sdk](https://unofficial-qwacks-godot-sdk.github.io/qwacks-godot-sdk/)**
