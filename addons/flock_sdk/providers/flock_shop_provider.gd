@@ -116,7 +116,26 @@ func purchase_async(shop_item_id: String, player_id: String = "") -> Variant:
 			"status": "Purchased",
 		})
 
-	return result
+	if result is Dictionary:
+		return ShopModels.parse_purchase_result(result)
+	return {"error": "Unexpected response from server"}
+
+
+# Consumes an owned inventory item, granting its rewards. Returns the updated row plus what was granted.
+# Consuming grants currency, so it carries the same double-spend risk as a purchase: an ambiguous failure surfaces
+# rather than being re-sent. Only 408/429 (provably not processed) retry.
+func consume_async(inventory_id: String) -> Variant:
+	require_not_empty(inventory_id, "Inventory ID")
+	var result = await execute_async(func() -> Variant:
+		var url := "%s/%s" % [_client.get_versioned_api_url(), FlockEndpoints.player_inventory_consume(inventory_id)]
+		# Route takes no request body — an empty object keeps the POST well-formed.
+		return await FlockHttpClient.post_async(url, {}, _client.get_base_headers(), -1.0, true)
+	, "Consume inventory item", false)
+	if result is Dictionary and result.has("error"):
+		return result
+	if result is Dictionary:
+		return ShopModels.parse_consume_result(result)
+	return {"error": "Unexpected response from server"}
 
 
 func get_player_inventory_async(player_id: String = "", page: int = 1, limit: int = 100) -> Variant:

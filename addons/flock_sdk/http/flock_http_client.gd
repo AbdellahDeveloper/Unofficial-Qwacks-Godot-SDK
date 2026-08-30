@@ -11,9 +11,9 @@ static func get_async(url: String, headers: Dictionary = {}, timeout: float = -1
 	return await http.get_async(url, headers)
 
 
-static func post_async(url: String, data: Dictionary = {}, headers: Dictionary = {}, timeout: float = -1.0) -> Variant:
+static func post_async(url: String, data: Dictionary = {}, headers: Dictionary = {}, timeout: float = -1.0, force_json_body: bool = false) -> Variant:
 	var http := FlockHttpRequest.new(timeout if timeout > 0 else _default_timeout)
-	return await http.post_async(url, data, headers)
+	return await http.post_async(url, data, headers, force_json_body)
 
 
 static func put_async(url: String, data: Dictionary = {}, headers: Dictionary = {}, timeout: float = -1.0) -> Variant:

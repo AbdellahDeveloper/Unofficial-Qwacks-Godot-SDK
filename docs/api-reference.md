@@ -226,7 +226,7 @@ var assets = FlockUtil.flock_assets_dir()   # user://flock/assets/
 ### FlockSdkVersion
 
 ```gdscript
-print(FlockSdkVersion.CURRENT)  # "1.28.0"
+print(FlockSdkVersion.CURRENT)  # "1.37.0"
 ```
 
 ---

@@ -3,6 +3,9 @@ extends FlockProviderBase
 
 const SNAPSHOT_CATEGORY := "command"
 const PENDING_WRITES_KEY := "pending_writes"
+# Backstop against a write the failure classifier misreads as transient. High enough that a real
+# multi-day outage keeps the player's writes; low enough that a stuck one eventually clears itself.
+const MAX_REPLAY_ATTEMPTS := 50
 
 var _pending_writes: Array = []
 var _queue_loaded := false
@@ -78,8 +81,27 @@ func flush_pending_writes_async() -> void:
 		, write.context)
 
 		if result is Dictionary and result.has("error"):
-			_flush_in_flight = false
-			return
+			write.attempts += 1
+
+			# transient/401 -> keep queued; permanent 4xx will never succeed -> drop so it can't block the queue.
+			# The cap backstops anything misread as transient; generous so a real outage keeps the writes.
+			if not _is_permanent_failure(result) and write.attempts < MAX_REPLAY_ATTEMPTS:
+				_persist_queue()
+				_client._logger.log_warning("Pending-write flush halted at '%s' (attempt %d), will retry next flush: %s" % [
+					write.context, write.attempts, result.get("error", "")])
+				break
+
+			if not _is_permanent_failure(result):
+				_client._logger.log_error("Dropping queued write '%s' after %d failed replays — it never became deliverable: %s" % [
+					write.context, write.attempts, result.get("error", "")])
+			else:
+				_client._logger.log_error("Dropping rejected queued write '%s' (HTTP %d): %s" % [
+					write.context, int(result.get("status_code", 0)), result.get("error", "")])
+			_pending_writes.pop_front()
+			_persist_queue()
+			# the optimistic value we cached for it was never accepted -> evict so the next read refetches authoritative state.
+			_evict_optimistic_row(write.payload_json)
+			continue
 
 		_pending_writes.pop_front()
 		_persist_queue()
@@ -161,8 +183,12 @@ func _enqueue_offline(path: String, payload: Dictionary, context: String) -> Dic
 	_ensure_queue_loaded()
 	var write := PendingDataWrite.new(path, JSON.stringify(payload), context)
 	_pending_writes.append(write)
-	_persist_queue()
-	_client._logger.log_warning("%s: offline — queued for sync on reconnect" % context)
+	# The overlay is already applied, so claiming "queued" when it never reached disk leaves a read
+	# returning a value the server will never hold.
+	if _persist_queue():
+		_client._logger.log_warning("%s: offline — queued for sync on reconnect" % context)
+	else:
+		_client._logger.log_error("%s: offline and the queue could not be saved — this change is lost if the app closes before reconnecting." % context)
 	return {"offline": true, "queued": true}
 
 
@@ -180,16 +206,56 @@ func _ensure_queue_loaded() -> void:
 				_pending_writes.append(PendingDataWrite.deserialize(item))
 
 
-func _persist_queue() -> void:
-	if _client._snapshot_store:
-		var serialized := []
-		for write: PendingDataWrite in _pending_writes:
-			serialized.append(write.serialize())
-		_client._snapshot_store.write(_get_queue_scope(), PENDING_WRITES_KEY, serialized)
+# False when the queue never reached disk - still flushes this session, but gone if the app dies first.
+func _persist_queue() -> bool:
+	if _client._snapshot_store == null:
+		return false
+	var serialized := []
+	for write: PendingDataWrite in _pending_writes:
+		serialized.append(write.serialize())
+	return _client._snapshot_store.write(_get_queue_scope(), PENDING_WRITES_KEY, serialized)
 
 
 func _get_queue_scope() -> String:
 	return "%s/%s/%s" % [_client.game_version_id, SNAPSHOT_CATEGORY, _queue_player_id]
+
+
+# 4xx except 408/429 is an authoritative failure that won't succeed on retry -> drop; 401 is recoverable
+# via re-login -> keep queued. A bare 403 never drops; only a backend-coded one is authoritative.
+static func _is_permanent_failure(result: Dictionary) -> bool:
+	var status := int(result.get("status_code", -1))
+	if status == -1:
+		return false
+	# 401 clears on re-login. Only a backend-coded 403 is authoritative - a bare one is a proxy or WAF.
+	if status == 401:
+		return false
+	if status == 403:
+		return not str(result.get("code", "")).is_empty()
+	return FlockException.FlockNetworkException.is_permanent_status(status)
+
+
+# Evicts the optimistic cache row a rejected write had written, so the next read pulls authoritative state.
+# Skips eviction when another still-queued write targets the same row — its overlay must survive. Called
+# after the rejected write is already dequeued, so _pending_writes holds only the remaining writes.
+func _evict_optimistic_row(payload_json: String) -> void:
+	var player_data_id := _extract_player_data_id(payload_json)
+	if player_data_id.is_empty():
+		return
+	for write: PendingDataWrite in _pending_writes:
+		if _extract_player_data_id(write.payload_json) == player_data_id:
+			return
+	if _client.player:
+		_client.player.evict_player_cache_by_row(player_data_id)
+
+
+# Reads player_data_id off a queued payload; empty if absent/unparseable.
+static func _extract_player_data_id(payload_json: String) -> String:
+	if payload_json.is_empty():
+		return ""
+	var parsed = JSON.parse_string(payload_json)
+	if parsed is Dictionary:
+		return str(parsed.get("player_data_id", ""))
+	return ""
 
 
 func _apply_to_player_cache(data: Variant) -> Variant:

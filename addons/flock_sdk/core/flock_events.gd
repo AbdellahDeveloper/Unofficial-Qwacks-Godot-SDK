@@ -21,7 +21,16 @@ signal session_started(session_id: String)
 signal session_ended(args: Dictionary)
 signal session_paused
 signal session_resumed
+
+# Notifications
+signal unread_count_changed(count: int)
+signal notification_received(notification: Dictionary)
+
 signal consent_changed(granted: bool)
+
+# Account linking
+signal account_linked(provider: int)
+signal account_unlinked(provider: int)
 
 var _logger: RefCounted = null
 var _late_initialized: bool = false
@@ -113,10 +122,34 @@ func invoke_session_resumed() -> void:
 		_logger.log_debug("OnSessionResumed fired")
 
 
+func invoke_unread_count_changed(count: int) -> void:
+	unread_count_changed.emit(count)
+	if _logger:
+		_logger.log_debug("OnUnreadCountChanged fired -> %s" % str(count))
+
+
+func invoke_notification_received(notification: Dictionary) -> void:
+	notification_received.emit(notification)
+	if _logger:
+		_logger.log_debug("OnNotificationReceived fired -> %s" % str(notification.get("id", "")))
+
+
 func invoke_consent_changed(granted: bool) -> void:
 	consent_changed.emit(granted)
 	if _logger:
 		_logger.log_debug("OnConsentChanged fired -> %s" % str(granted))
+
+
+func invoke_account_linked(provider: int) -> void:
+	account_linked.emit(provider)
+	if _logger:
+		_logger.log_debug("OnAccountLinked fired -> provider: %s" % str(provider))
+
+
+func invoke_account_unlinked(provider: int) -> void:
+	account_unlinked.emit(provider)
+	if _logger:
+		_logger.log_debug("OnAccountUnlinked fired -> provider: %s" % str(provider))
 
 
 func clear_all() -> void:

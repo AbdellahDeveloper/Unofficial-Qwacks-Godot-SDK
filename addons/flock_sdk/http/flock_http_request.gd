@@ -11,8 +11,8 @@ func get_async(url: String, headers: Dictionary = {}) -> Variant:
 	return await _send_async("GET", url, headers, "")
 
 
-func post_async(url: String, data: Dictionary = {}, headers: Dictionary = {}) -> Variant:
-	var body := JSON.stringify(data) if data.size() > 0 else ""
+func post_async(url: String, data: Dictionary = {}, headers: Dictionary = {}, force_json_body: bool = false) -> Variant:
+	var body := JSON.stringify(data) if data.size() > 0 else ("{}" if force_json_body else "")
 	return await _send_async("POST", url, headers, body)
 
 
@@ -28,6 +28,54 @@ func patch_async(url: String, data: Dictionary = {}, headers: Dictionary = {}) -
 
 func delete_async(url: String, headers: Dictionary = {}) -> Variant:
 	return await _send_async("DELETE", url, headers, "")
+
+
+# Enough field errors to spot the pattern without flooding the console line.
+const MAX_FIELD_ERRORS_SHOWN := 3
+
+# Two shapes share `detail`: the game routes' coded {code,message} object, and FastAPI's own 422 array of field errors.
+func _parse_error_detail(body: String) -> Dictionary:
+	var parsed = JSON.parse_string(body)
+	if not parsed is Dictionary:
+		return {}
+	var detail = parsed.get("detail", null)
+	if detail is Dictionary:
+		return {"code": str(detail.get("code", "")), "message": str(detail.get("message", ""))}
+	if detail is Array:
+		return {"code": "", "message": _describe_field_errors(detail)}
+	if detail is String and not detail.is_empty():
+		return {"code": "", "message": detail}
+	return {}
+
+
+# "body.player_data: Input should be a valid dictionary" — names the offending field so the caller can fix the payload.
+func _describe_field_errors(errors: Array) -> String:
+	var parts: Array[String] = []
+	var shown := 0
+	for e in errors:
+		if shown == MAX_FIELD_ERRORS_SHOWN:
+			parts.append("(+%d more)" % (errors.size() - shown))
+			break
+		if not e is Dictionary:
+			continue
+		var why := str(e.get("msg", ""))
+		if why.is_empty():
+			continue
+		var where := _join_location(e.get("loc", null))
+		parts.append(why if where.is_empty() else "%s: %s" % [where, why])
+		shown += 1
+	return "; ".join(parts)
+
+
+static func _join_location(location) -> String:
+	if not location is Array or location.size() == 0:
+		return ""
+	var path := ""
+	for part in location:
+		if not path.is_empty():
+			path += "."
+		path += str(part)
+	return path
 
 
 func _send_async(method: String, url: String, headers: Dictionary, body: String) -> Variant:
@@ -72,24 +120,28 @@ func _send_async(method: String, url: String, headers: Dictionary, body: String)
 				return {"error": "Failed to parse response JSON"}
 			return parsed
 		else:
-			var error_code := ""
-			var parsed_body = JSON.parse_string(body_text)
-			if parsed_body is Dictionary and parsed_body.has("detail"):
-				var detail = parsed_body["detail"]
-				if detail is Dictionary:
-					error_code = detail.get("code", "")
+			var detail := _parse_error_detail(body_text)
+			var error_code: String = detail.get("code", "")
+			var server_message: String = detail.get("message", "")
+			var hint := FlockErrorHints.for_code(FlockErrorCodes.parse(error_code))
+
+			# The server's reason beats our generic fallback whenever the body carried one.
+			var fallback := "HTTP request failed"
+			if response_code == 401 or response_code == 403:
+				fallback = "Authentication failed"
+			elif response_code == 400 or response_code == 422:
+				fallback = "Validation failed"
 
 			var error_dict := {
-				"error": "HTTP %d" % response_code,
+				"error": FlockErrorHints.compose("", server_message, error_code, response_code, hint, fallback),
 				"status_code": response_code,
 				"code": error_code,
 				"body": body_text,
 			}
-
-			if response_code == 401 or response_code == 403:
-				error_dict["error"] = "Authentication failed (HTTP %d)" % response_code
-			elif response_code == 400 or response_code == 422:
-				error_dict["error"] = "Validation failed (HTTP %d)" % response_code
+			if not server_message.is_empty():
+				error_dict["server_message"] = server_message
+			if not hint.is_empty():
+				error_dict["hint"] = hint
 
 			return error_dict
 	else:
